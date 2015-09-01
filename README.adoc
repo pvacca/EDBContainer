@@ -7,4 +7,5 @@ Scripts pertaining to the deployment of EDB software and tools on containers suc
 * Select a machine package
 * Create a machine
 * Configure install_ppas.sh
+* Add pg_hba entries to pg_hba_conf/pg_hba.conf
 * Execute install_ppas.sh
