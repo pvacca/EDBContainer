@@ -1,0 +1,4 @@
+\set COMP_KEYWORD_CASE preserve-upper
+
+\timing
+\pset null '(NULL)'
