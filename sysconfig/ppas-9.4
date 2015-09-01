@@ -1,6 +1,9 @@
 PGENGINE=/usr/ppas-9.4/bin
 PGPORT=5432
 PGDATA=/pgdata/ppas-9.4
+
+# initial startup log to default location; redirect log to /pglog/ppas-9.4 in postgresql.logging.conf
 PGLOG=/var/lib/ppas/9.4/pgstartup.log
+
 #INITDBOPTS="--no-redwood-compat"
 INITDBOPTS="--auth-local=peer --auth-host=md5 --xlogdir=/pgxlog/ppas-9.4/"
