@@ -12,3 +12,4 @@ Scripts pertaining to the deployment of EDB software and tools on containers suc
 ** Add pg_hba entries to pg_hba_conf/pg_hba.conf
 ** Configure install_ppas.sh
 ** Execute install_ppas.sh
+** Copy appropriate dynamic .conf file to image
