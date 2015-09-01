@@ -21,7 +21,7 @@ echo "export PGPORT=$PGPORT" >> ~/.bashrc
 echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > ~/.pgpass && chmod 0600 ~/.pgpass
 
 # create Advanced Server instance
-#service ppas-9.4 initdb
+service ppas-9.4 initdb
 service ppas-9.4 start
 
 pushd ~enterprisedb
