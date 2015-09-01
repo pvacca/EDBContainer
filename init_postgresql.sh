@@ -21,12 +21,13 @@ echo "export PGPORT=$PGPORT" >> ~/.bashrc
 echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > ~/.pgpass && chmod 0600 ~/.pgpass
 
 # create Advanced Server instance
-service ppas-9.4 initdb
+#service ppas-9.4 initdb
 service ppas-9.4 start
 
-sudo -u enterprisedb edb-psql -q -c "ALTER ROLE enterprisedb LOGIN ENCRYPTED PASSWORD '$ENTERPRISEDB_PASSWD';" edb
-echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > ~enterprisedb/.pgpass
-
-sudo -u enterprisedb source create_extensions.sh
+pushd ~enterprisedb
+SQL_ALTER_USER="ALTER ROLE enterprisedb LOGIN ENCRYPTED PASSWORD '$ENTERPRISEDB_PASS';"
+su enterprisedb -c "edb-psql -q -c \"$SQL_ALTER_USER\" edb"
+echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > .pgpass
+popd
 
 service ppas-9.4 stop

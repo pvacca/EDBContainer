@@ -1,0 +1,6 @@
+#!/bin/sh
+
+TARGET="$1"
+YUMUSER=""
+YUMPASS=""
+ENTERPRISEDB_PASS=""
