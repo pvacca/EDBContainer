@@ -2,7 +2,7 @@ EDBContainer
 ============
 Scripts pertaining to the deployment of EDB software and tools on containers such as Docker, Joyent Triton, Azure, etc.
 
-Instructions for installing PPAS on Joyent Triton:
+.Instructions for installing PPAS on Joyent Triton:
 * Select the most recent CentOS 6 "Container native" image
 * Select a machine package
 * Create a machine
