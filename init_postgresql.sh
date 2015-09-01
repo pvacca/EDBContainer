@@ -19,6 +19,7 @@ chown enterprisedb:enterprisedb $PGXLOG
 echo "export PGDATA=$PGDATA" >> ~/.bashrc
 echo "export PGPORT=$PGPORT" >> ~/.bashrc
 echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > ~/.pgpass && chmod 0600 ~/.pgpass
+echo "export PAGER=less" >> ~/.bashrc
 
 # create Advanced Server instance
 service ppas-9.4 initdb
@@ -30,4 +31,6 @@ su enterprisedb -c "edb-psql -q -c \"$SQL_ALTER_USER\" edb"
 echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > .pgpass
 popd
 
+sed -i -e 's/peer$/md5/g' $PGDATA/pg_hba.conf
 service ppas-9.4 stop
+echo "include = 'postgresql.edb.conf'" >> $PGDATA/postgresql.conf
