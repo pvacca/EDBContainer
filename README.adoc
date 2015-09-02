@@ -3,9 +3,13 @@ EDBContainer
 Scripts pertaining to the deployment of EDB software and tools on containers such as Docker, Joyent Triton, Azure, etc.
 
 .Instructions for installing PPAS on Joyent Triton:
-* Select the most recent CentOS 6 "Container native" image
-* Select a machine package
-* Create a machine
-* Configure install_ppas.sh
-* Add pg_hba entries to pg_hba_conf/pg_hba.conf
-* Execute install_ppas.sh
+* Create a new Triton instance
+** Select the most recent CentOS 6 "Container native" image
+** Select a machine package
+** Create a machine
+* Configure EDB Postgres Plus Advanced Server
+** Verify port and file paths in sysconfig/ppas-9.4
+** Add pg_hba entries to pg_hba_conf/pg_hba.conf
+** Configure install_ppas.sh
+** Execute install_ppas.sh
+** Copy appropriate dynamic .conf file to image
