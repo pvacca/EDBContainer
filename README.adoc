@@ -9,8 +9,8 @@ Scripts pertaining to the deployment of EDB software and tools on containers suc
 ** Create a machine
 
 .Configure EDB Postgres Plus Advanced Server
-* Verify port and file paths in sysconfig/ppas-9.4 & enterprisedb_user/.bash_profile
-* Add pg_hba entries to pg_hba_conf/pg_hba.conf
-* Configure install_ppas.sh
+* Verify port and file paths in `sysconfig/ppas-9.4` & `enterprisedb_user/.bash_profile`
+* Add pg_hba entries to `pg_hba_conf/pg_hba.conf`
+* Configure `install_ppas.sh`
 * Execute `./install_ppas.sh <<name of target server>>`
-* Copy appropriate dynamic .conf file to image
+* Copy appropriate dynamic .conf file to image as `postgresql.memory.conf`
