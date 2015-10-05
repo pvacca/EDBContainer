@@ -1,0 +1,17 @@
+[enterprisedb]
+name=EnterpriseDB Postgres Plus Advanced Server 9.4 $releasever - $basearch
+username=$YUM0
+password=$YUM1
+baseurl=http://yum.enterprisedb.com/9.4/redhat/rhel-$releasever-$basearch
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/ENTERPRISEDB-GPG-KEY
+
+[enterprisedb-tools]
+name=EnterpriseDB Tools $releasever - $basearch
+username=$YUM0
+password=$YUM1
+baseurl=http://yum.enterprisedb.com/tools/redhat/rhel-$releasever-$basearch
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/ENTERPRISEDB-GPG-KEY
