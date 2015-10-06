@@ -1,5 +1,6 @@
 #!/bin/sh
 ## Postgres Plus Advanced Server 9.4 setup and initialization script.
+set -e
 
 ENTERPRISEDB_PASS="$1"
 export PGDATA=/pgdata/ppas-9.4
@@ -27,7 +28,7 @@ service ppas-9.4 start
 
 pushd ~enterprisedb
 SQL_ALTER_USER="ALTER ROLE enterprisedb LOGIN ENCRYPTED PASSWORD '$ENTERPRISEDB_PASS';"
-su enterprisedb -c "edb-psql -q -c \"$SQL_ALTER_USER\" edb"
+su enterprisedb -c "edb-psql -q -c \"$SQL_ALTER_USER\" template1"
 echo "*:$PGPORT:*:enterprisedb:$ENTERPRISEDB_PASS" > .pgpass
 popd
 
