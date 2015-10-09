@@ -7,4 +7,5 @@ PGXLOG=/pgxlog/ppas-9.4
 PGLOG=/var/lib/ppas/9.4/pgstartup.log
 
 #INITDBOPTS="--no-redwood-compat"
+#INITDBOPTS="--pwfile=''"
 INITDBOPTS="--auth-local=peer --auth-host=md5 --xlogdir=$PGXLOG"
