@@ -1,2 +1,4 @@
 .yum*
 .enterprisedb*
+scratch
+log
