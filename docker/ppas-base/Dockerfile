@@ -2,10 +2,14 @@ FROM edb-yum
 MAINTAINER phil.vacca@enterprisedb.com
 LABEL vendor="EnterpriseDB" \
   version="0.1" \
-  description="EnterpriseDB base installation of PPAS and PEM Agent. No configuration or initdb." \
+  description="EnterpriseDB base installation of PPAS and PEM Agent. Installs edb packages from Yum, creates and sets perms on all required directories. No configuration or initdb." \
   type="ppas-base"
 
 ENV PG_MAJOR 9.4
+
+ENV PGDATA=/pgdata/ppas-$PG_MAJOR \
+    PGXLOG=/pgxlog/ppas-$PG_MAJOR \
+    PGLOG=/pglog/ppas-$PG_MAJOR
 
 RUN echo $PG_MAJOR > /etc/yum/vars/postgresql_majorversion
 COPY .yumusername /etc/yum/vars/username
@@ -17,13 +21,13 @@ RUN yum makecache && yum install -y \
  && rm -f /etc/yum/vars/username \
  && rm -f /etc/yum/vars/password
 
-RUN mkdir -p /pgdata/ppas-$PG_MAJOR \
- && mkdir -p /pgxlog/ppas-$PG_MAJOR \
- && mkdir -p /pglog/ppas-$PG_MAJOR \
- && mkdir -p /var/run/ppas-$PG_MAJOR \
- && mkdir /etc/ppas-$PG_MAJOR \
- && chown enterprisedb:enterprisedb /pgdata/ppas-$PG_MAJOR \
- && chown enterprisedb:enterprisedb /pgxlog/ppas-$PG_MAJOR \
- && chown enterprisedb:enterprisedb /pglog/ppas-$PG_MAJOR \
+RUN ( [ -d $PGDATA ] || mkdir -p $PGDATA ) \
+ && ( [ -d $PGXLOG ] || mkdir -p $PGXLOG ) \
+ && ( [ -d $PGLOG ] || mkdir -p $PGLOG ) \
+ && ( [ -d /var/run/ppas-$PG_MAJOR ] || mkdir -p /var/run/ppas-$PG_MAJOR ) \
+ && ( [ -d /etc/ppas-$PG_MAJOR ] || mkdir -p /etc/ppas-$PG_MAJOR ) \
+ && chown enterprisedb:enterprisedb $PGDATA \
+ && chown enterprisedb:enterprisedb $PGXLOG \
+ && chown enterprisedb:enterprisedb $PGLOG \
  && chown enterprisedb:enterprisedb /var/run/ppas-$PG_MAJOR \
  && chown enterprisedb:enterprisedb /etc/ppas-$PG_MAJOR

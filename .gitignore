@@ -2,3 +2,4 @@
 .enterprisedb*
 scratch
 log
+docker/*/conf/*.conf
