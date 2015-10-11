@@ -5,10 +5,12 @@ LABEL vendor="EnterpriseDB" \
   description="Postgres Plus Advanced Server volume only container." \
   type="volume"
 
-ENV PGDATA=/pgdata/ppas-$PG_MAJOR \
-    PGXLOG=/pgxlog/ppas-$PG_MAJOR \
-    PGLOG=/pglog/ppas-$PG_MAJOR
+ENV PG_MAJOR 9.4
 
-COPY entrypoint.sh /root/entrypoint.sh
+ENV PGDATA=/pgdata/ppas-9.4 \
+    PGXLOG=/pgxlog/ppas-9.4 \
+    PGLOG=/pglog/ppas-9.4
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

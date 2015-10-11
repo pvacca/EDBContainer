@@ -1,14 +1,8 @@
 #!/bin/sh
 set -e
 
-mkdir -p $PGDATA
-mkdir -p $PGXLOG
-mkdir -p $PGLOG
-
-chown enterprisedb:enterprisedb $PGDATA
-chown enterprisedb:enterprisedb $PGXLOG
-chown enterprisedb:enterprisedb $PGLOG
-
-chown enterprisedb:enterprisedb /var/run/ppas-$PG_MAJOR
+mkdir -p $PGDATA && chown -R enterprisedb:enterprisedb $PGDATA
+mkdir -p $PGXLOG && chown -R enterprisedb:enterprisedb $PGXLOG
+mkdir -p $PGLOG && chown -R enterprisedb:enterprisedb $PGLOG
 
 runuser -l enterprisedb -c "exec '$@'"

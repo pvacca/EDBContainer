@@ -9,7 +9,8 @@ ENV PG_MAJOR 9.4
 
 ENV PGDATA=/pgdata/ppas-$PG_MAJOR \
     PGXLOG=/pgxlog/ppas-$PG_MAJOR \
-    PGLOG=/pglog/ppas-$PG_MAJOR
+    PGLOG=/pglog/ppas-$PG_MAJOR \
+    PGCONF=/etc/ppas-$PG_MAJOR
 
 RUN echo $PG_MAJOR > /etc/yum/vars/postgresql_majorversion
 COPY .yumusername /etc/yum/vars/username
@@ -21,13 +22,14 @@ RUN yum makecache && yum install -y \
  && rm -f /etc/yum/vars/username \
  && rm -f /etc/yum/vars/password
 
-RUN ( [ -d $PGDATA ] || mkdir -p $PGDATA ) \
+RUN mkdir -p /var/run/lock/subsys \
+ && ( [ -d $PGDATA ] || mkdir -p $PGDATA ) \
  && ( [ -d $PGXLOG ] || mkdir -p $PGXLOG ) \
  && ( [ -d $PGLOG ] || mkdir -p $PGLOG ) \
  && ( [ -d /var/run/ppas-$PG_MAJOR ] || mkdir -p /var/run/ppas-$PG_MAJOR ) \
- && ( [ -d /etc/ppas-$PG_MAJOR ] || mkdir -p /etc/ppas-$PG_MAJOR ) \
+ && ( [ -d $PGCONF ] || mkdir -p $PGCONF ) \
  && chown enterprisedb:enterprisedb $PGDATA \
  && chown enterprisedb:enterprisedb $PGXLOG \
  && chown enterprisedb:enterprisedb $PGLOG \
  && chown enterprisedb:enterprisedb /var/run/ppas-$PG_MAJOR \
- && chown enterprisedb:enterprisedb /etc/ppas-$PG_MAJOR
+ && chown enterprisedb:enterprisedb $PGCONF

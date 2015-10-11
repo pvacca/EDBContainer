@@ -2,6 +2,7 @@
 set -e
 
 LISTEN_ADDRESSES=${LISTEN_ADDRESSES:-"*"}
+AUTH=${AUTH:-"md5"}
 
 # # For SELinux we need to use 'runuser' not 'su'
 # if [ -x /sbin/runuser ]
@@ -11,8 +12,8 @@ LISTEN_ADDRESSES=${LISTEN_ADDRESSES:-"*"}
 #     SU=su
 # fi
 
-# commands are: initdb, start; any other arguments passed to exec
-# if [ "$1" = "initdb" ]; then
+## commands are: initdb, start - with trailing arguments appended to initdb
+##     or pg_ctl respectively; any other argument passed to exec
 case "$1" in
 "initdb" )
   shift
@@ -23,14 +24,14 @@ PGDATA="$PGDATA"
 PGXLOG="$PGXLOG"
 PGLOG="$PGLOG"
 
-INITDBOPTS="--auth=md5 \
---xlogdir=$PGXLOG --pwfile=/tmp/edbpass $@"
+INITDBOPTS="--auth=$AUTH --xlogdir=$PGXLOG --pwfile=/tmp/edbpass $@"
 EOF
   # service ppas-$PG_MAJOR initdb
-  # $SU -l enterprisedb -c "
-  $PGENGINE/initdb --auth=md5 --pgdata=$PGDATA \
-    --xlogdir=$PGXLOG --pwfile=/tmp/edbpass \
-      >> $PGLOG/startup.log 2>&1
+  $PGENGINE/initdb --auth=$AUTH \
+    --pgdata=$PGDATA \
+    --xlogdir=$PGXLOG \
+    --pwfile=/tmp/edbpass \
+      >> $PGLOG/initdb.log 2>&1
 
   rm -f /tmp/edbpass
 
@@ -40,21 +41,13 @@ EOF
   echo "include = '/etc/ppas-$PG_MAJOR/postgresql.edb.conf'" >> $PGDATA/postgresql.conf
   echo "host all all 0.0.0.0/0 md5" >> $PGDATA/pg_hba.conf
 
-  # clear any command line arguments that have been passed to initdb
-  #while (( "$#" )); do shift; done  --preserve-environment
-  #  $SU -l enterprisedb \
-  $PGENGINE/pg_ctl start --log=$PGLOG/startup.log
+  $PGENGINE/pg_ctl start --log $PGLOG/pgstart.log >> $PGLOG/startup.log 2>&1 && /bin/bash
   # service ppas-9.4 start
-#fi
   ;;
 "start")
-# if [ "$1" = "start" ]; then
   shift
-  $PGENGINE/pg_ctl start --log=$PGLOG/startup.log "$@"
+  $PGENGINE/pg_ctl start --log $PGLOG/pgstart.log "$@" >> $PGLOG/startup.log 2>&1 && /bin/bash
   # service ppas-9.4 start
-  # clear any command line arguments that have been passed to pg_ctl
-  # while (( "$#" )); do shift; done
-#fi
   ;;
 *)
   exec "$@"
