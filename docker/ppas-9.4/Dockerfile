@@ -5,37 +5,47 @@ LABEL vendor="EnterpriseDB" \
   decription="Configured Postgres Plus Advanced Server. The entrypoint.sh can accept `initdb` or `start`, and will pass additional options onto initdb or pg_ctl respectively." \
   type="ppas"
 
-## Passfile required to set initdb. Could easily replace this with:
-## `RUN echo "$ENTERPRISEDB_PASS" > /tmp/edbpass`
+## Passfile required for initdb. Could replace with(?):
+##  `RUN echo "$ENTERPRISEDB_PASS" > /tmp/edbpass && chmod 0400 /tmp/edbpass`
 COPY .enterprisedbpass /tmp/edbpass
-COPY conf/*.conf /etc/ppas-$PG_MAJOR/
 
-RUN touch /etc/ppas-$PG_MAJOR/postgresql.memory.conf \
- && chown -R enterprisedb:enterprisedb /etc/ppas-$PG_MAJOR \
- && mkdir -p /service/ppas/ && touch /service/ppas/ppas-$PG_MAJOR \
+RUN mkdir /entrypoint-initdb.d
+COPY initdb.d/* /entrypoint-initdb.d/
+COPY conf/*.conf /etc/$PPAS/
+COPY entrypoint.sh /$EDBHOME/entrypoint.sh
+
+RUN touch /etc/$PPAS/postgresql.memory.conf \
+ && chown -R enterprisedb:enterprisedb /etc/$PPAS \
+ && mkdir -p /service/ppas/ && touch /service/ppas/$PPAS \
  && chown -R enterprisedb:enterprisedb /service/ppas \
  && chown enterprisedb:enterprisedb /tmp/edbpass \
- && echo "" > ~enterprisedb/.bash_profile
+ && chown enterprisedb:enterprisedb /$EDBHOME/entrypoint.sh \
+ && chown -R enterprisedb:enterprisedb /entrypoint-initdb.d
+# && cat > ~enterprisedb/.bash_profile <<-EOF
+#[ -f /etc/profile ] && source /etc/profile
+#export PATH="$PATH:$PGENGINE"
+#export PGPORT="$PGPORT"
+#export PGDATA="$PGDATA"
+#export PAGER=less
+#EOF
 
-WORKDIR /var/lib/ppas
-COPY entrypoint.sh /var/lib/ppas/entrypoint.sh
-RUN chown enterprisedb:enterprisedb entrypoint.sh
-
+WORKDIR $EDBHOME
 USER enterprisedb
 
-ENV PG_MAJOR 9.4
+ENV PPAS_MAJOR 9.4
 ENV PGPORT 5432
+ENV PPAS ppas-$PPAS_MAJOR
 
-ENV PGDATA=/pgdata/ppas-$PG_MAJOR \
-  PGXLOG=/pgxlog/ppas-$PG_MAJOR \
-  PGLOG=/pglog/ppas-$PG_MAJOR \
-  PGENGINE=/usr/ppas-$PG_MAJOR/bin \
-  PATH=/usr/ppas-$PG_MAJOR/bin:$PATH
+ENV PGDATA=/pgdata/$PPAS \
+  PGXLOG=/pgxlog/$PPAS \
+  PGLOG=/pglog/$PPAS \
+  PGENGINE=/usr/$PPAS/bin \
+  PATH=/usr/$PPAS/bin:$PATH
 
 # volume for Unix socket
-VOLUME /var/run/ppas-$PG_MAJOR
+VOLUME /var/run/$PPAS
 
-# VOLUME $PGDATA $PGXLOG $PGLOG
+VOLUME /pgdata /pgxlog /pglog
 
 EXPOSE $PGPORT
 
