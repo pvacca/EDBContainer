@@ -14,3 +14,6 @@ ENV PGDATA=/pgdata/ppas-9.4 \
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+# Start commands are: data-only, xlog-only, dataxlog, log-only, all
+CMD ["all"]
