@@ -32,4 +32,6 @@ RUN mkdir -p /var/run/lock/subsys \
  && chown enterprisedb:enterprisedb $PGXLOG \
  && chown enterprisedb:enterprisedb $PGLOG \
  && chown enterprisedb:enterprisedb /var/run/$PPAS \
- && chown enterprisedb:enterprisedb /etc/$PPAS
+ && chown enterprisedb:enterprisedb /etc/$PPAS \
+ && touch ~enterprisedb/.pgpass && chmod 0600 ~enterprisedb/.pgpass \
+ && chown enterprisedb:enterprisedb ~enterprisedb/.pgpass

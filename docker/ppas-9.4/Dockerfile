@@ -16,18 +16,9 @@ COPY entrypoint.sh /$EDBHOME/entrypoint.sh
 
 RUN touch /etc/$PPAS/postgresql.memory.conf \
  && chown -R enterprisedb:enterprisedb /etc/$PPAS \
- && mkdir -p /service/ppas/ && touch /service/ppas/$PPAS \
- && chown -R enterprisedb:enterprisedb /service/ppas \
  && chown enterprisedb:enterprisedb /tmp/edbpass \
  && chown enterprisedb:enterprisedb /$EDBHOME/entrypoint.sh \
  && chown -R enterprisedb:enterprisedb /entrypoint-initdb.d
-# && cat > ~enterprisedb/.bash_profile <<-EOF
-#[ -f /etc/profile ] && source /etc/profile
-#export PATH="$PATH:$PGENGINE"
-#export PGPORT="$PGPORT"
-#export PGDATA="$PGDATA"
-#export PAGER=less
-#EOF
 
 WORKDIR $EDBHOME
 USER enterprisedb
@@ -45,6 +36,7 @@ ENV PGDATA=/pgdata/$PPAS \
 # volume for Unix socket
 VOLUME /var/run/$PPAS
 
+# volume for any of: data, xlog, log, that don't get explicitly mounted in volume only containers
 VOLUME /pgdata /pgxlog /pglog
 
 EXPOSE $PGPORT
