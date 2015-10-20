@@ -1,5 +1,5 @@
 FROM edb-yum
-MAINTAINER phil.vacca@enterprisedb.com
+MAINTAINER Philip Vacca <phil.vacca@enterprisedb.com>
 LABEL vendor="EnterpriseDB" \
   version="0.1" \
   description="EnterpriseDB base installation of PPAS and PEM Agent. Installs edb packages from Yum, creates and sets perms on all required directories. No configuration or initdb." \
@@ -12,17 +12,15 @@ ENV PGDATA=/pgdata/$PPAS \
     PGXLOG=/pgxlog/$PPAS \
     PGLOG=/pglog/$PPAS
 
-RUN echo $PPAS_MAJOR > /etc/yum/vars/ppas_majorversion
 COPY .yumusername /etc/yum/vars/username
 COPY .yumpassword /etc/yum/vars/password
 
-RUN yum makecache && yum install -y \
+RUN echo $PPAS_MAJOR > /etc/yum/vars/ppas_majorversion \
+ && yum makecache && yum install -y \
   ppas94-server pem-agent \
  && yum clean all \
  && rm -f /etc/yum/vars/username \
- && rm -f /etc/yum/vars/password
-
-RUN mkdir -p /var/run/lock/subsys \
+ && rm -f /etc/yum/vars/password \
  && ( [ -d $PGDATA ] || mkdir -p $PGDATA ) \
  && ( [ -d $PGXLOG ] || mkdir -p $PGXLOG ) \
  && ( [ -d $PGLOG ] || mkdir -p $PGLOG ) \
