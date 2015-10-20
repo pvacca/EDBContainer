@@ -52,7 +52,9 @@ case "$1" in
   # If started as a linked container, this will also be in an environment var
   PRIMARY="$1" && shift
   [ "$REPL_PASSWORD" ] && \
-    echo "*:$PGPORT:replication:repl:$REPL_PASSWORD" >> ~/.pgpass
+    echo "*:$PGPORT:replication:repl:$REPL_PASSWORD" >> $EDBHOME/.pgpass
+
+  # $PGENGINE/edb-psql -h ppas -p 5432 -l >> $PGLOG/basebackup.log 2>&1
 
   $PGENGINE/pg_basebackup -U repl \
     -h "$PRIMARY" -p $PGPORT \

@@ -36,6 +36,9 @@ ENV PGDATA=/pgdata/$PPAS \
 # volume for Unix socket
 VOLUME /var/run/$PPAS
 
+# for internal dockers
+VOLUME $EDBHOME
+
 # volume for any of: data, xlog, log, that don't get explicitly mounted in volume only containers
 VOLUME /pgdata /pgxlog /pglog
 
