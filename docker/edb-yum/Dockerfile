@@ -12,4 +12,9 @@ COPY enterprisedb.repo /etc/yum.repos.d/enterprisedb.repo
 COPY ENTERPRISEDB-GPG-KEY /etc/pki/rpm-gpg/ENTERPRISEDB-GPG-KEY
 
 RUN groupadd enterprisedb \
- && useradd -m -d $EDBHOME -g enterprisedb enterprisedb
+ && useradd -m -d $EDBHOME -g enterprisedb enterprisedb \
+ && mkdir -p /var/run/lock/subsys
+
+WORKDIR $EDBHOME
+COPY yumentrypoint.sh /yumentrypoint.sh
+ENTRYPOINT ["/yumentrypoint.sh"]
