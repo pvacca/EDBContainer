@@ -4,3 +4,4 @@
 scratch
 log
 docker/*/conf/*.conf
+*.run
