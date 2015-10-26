@@ -6,19 +6,20 @@ LABEL vendor="EnterpriseDB" \
   type="pem-server"
 
 ENV PEM_SERVER=pem_server-5.0.0-2-linux-x64.run \
+    APACHE_PHP=apachephp-2.4.10-5.5.19-1-linux-x64.run \
+    PHP_EDBPEM=php_edbpem-5.5.19-5.0.0-2-linux-x64.run \
+    PHP_ROOT=/opt/apachephp \
+    PEM_ROOT=/opt/pem-server \
+    PEM_AGENT=/usr/pem-5.0 \
     PGENGINE=/usr/$PPAS/bin \
     PGDATA=/pgdata/$PPAS \
+    PGPORT=5444 \
     STARTUPLOG=/var/log/pgstartup.log
 
-COPY .enterprisedbpass /tmp/edbpass
-
-RUN chown enterprisedb:enterprisedb /tmp/edbpass \
+RUN mkdir -p $PGDATA \
  && chown enterprisedb:enterprisedb $PGDATA \
- && runuser -l enterprisedb \
-  -c "$PGENGINE/initdb --no-redwood-compat \
-    --pgdata $PGDATA \
-    --auth md5 \
-    --pwfile /tmp/edbpass"
+ && touch $STARTUPLOG \
+ && chown enterprisedb:enterprisedb $STARTUPLOG
 
 COPY $PEM_SERVER /root/
 # RUN wget -q --directory-prefix=/root/ http://get.enterprisedb.com/pem/$PEM_SERVER
@@ -29,30 +30,21 @@ RUN mkdir edbpem && mkdir apache-php \
  && ./$PEM_SERVER \
   --extract-apache-php apache-php \
   --extract-php_edbpem edbpem \
- && apache-php/apachephp-2.4.10-5.5.19-1-linux-x64.run \
+ && apache-php/$APACHE_PHP \
   --mode text \
   --port 8080 \
-  --prefix /opt/apachephp \
- && edbpem/php_edbpem-5.5.19-5.0.0-2-linux-x64.run \
-  --prefix /opt/apachephp \
+  --prefix $PHP_ROOT \
+ && edbpem/$PHP_EDBPEM \
+  --prefix $PHP_ROOT \
   --mode unattended
 
-COPY .edbaccountpass /tmp/edbaccountpass
-RUN runuser -l enterprisedb \
-  -c "$PGENGINE/pg_ctl -D $PGDATA -l /var/log/ppas start" \
- && echo "./$PEM_SERVER --mode unattended \
-  --existing-user phil.vacca@enterprisedb.com \
-  --existing-password $(cat /tmp/edbaccountpass) \
-  --show_adv_opt 1 \
-  --prefix /opt/pem-server \
-  --install-type both \
-  --pghost localhost \
-  --pgport 5444 \
-  --pguser enterprisedb \
-  --pgpassword $(cat /tmp/edbpass) \
-  --servicename $PPAS \
-  --agent_description 'PEM Server'" > cr.sh
+COPY entrypoint.sh /root/
+COPY generate_cert.sh /root/
 
 VOLUME $PGDATA
 
-EXPOSE 8443
+ENTRYPOINT ["./entrypoint.sh"]
+
+EXPOSE 8443 $PGPORT
+
+CMD [""]
