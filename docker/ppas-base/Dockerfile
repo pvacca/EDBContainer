@@ -1,8 +1,8 @@
 FROM edb-yum
 MAINTAINER Philip Vacca <phil.vacca@enterprisedb.com>
 LABEL vendor="EnterpriseDB" \
-  version="0.1" \
-  description="EnterpriseDB base installation of PPAS and PEM Agent. Installs edb packages from Yum, creates and sets perms on all required directories. No configuration or initdb." \
+  version="9.4" \
+  description="EnterpriseDB base installation of PPAS 9.4 and PEM Agent. Installs edb packages from Yum, creates and sets perms on all required directories. No configuration or initdb." \
   type="ppas-base"
 
 ENV PPAS_MAJOR 9.4
@@ -33,3 +33,6 @@ RUN echo $PPAS_MAJOR > /etc/yum/vars/ppas_majorversion \
  && chown enterprisedb:enterprisedb /etc/$PPAS \
  && touch ~enterprisedb/.pgpass && chmod 0600 ~enterprisedb/.pgpass \
  && chown enterprisedb:enterprisedb ~enterprisedb/.pgpass
+
+COPY pem-agent.sh /root/pem-agent.sh
+RUN . /root/pem-agent.sh && rm -f /root/pem-agent.sh
