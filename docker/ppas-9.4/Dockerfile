@@ -1,23 +1,18 @@
 FROM ppas-base:9.4
 MAINTAINER phil.vacca@enterprisedb.com
 LABEL vendor="EnterpriseDB" \
-  version="0.0.1" \
-  decription="Configured Postgres Plus Advanced Server. The entrypoint.sh can accept `initdb` or `start`, and will pass additional options onto initdb or pg_ctl respectively." \
+  version="9.4" \
+  decription="Configured Postgres Plus Advanced Server. The entrypoint.sh can accept `initdb`, `start`, or `replica` and will pass additional options onto initdb, postmaster, and pg_basebackup respectively." \
   type="ppas"
-
-## Passfile required for initdb. Could replace with(?):
-##  `RUN echo "$ENTERPRISEDB_PASS" > /tmp/edbpass && chmod 0400 /tmp/edbpass`
-COPY .enterprisedbpass /tmp/edbpass
 
 RUN mkdir /entrypoint-initdb.d
 COPY initdb.d/* /entrypoint-initdb.d/
 COPY conf/*.conf /etc/$PPAS/
-COPY entrypoint.sh /$EDBHOME/entrypoint.sh
+COPY entrypoint.sh $EDBHOME/entrypoint.sh
 
 RUN touch /etc/$PPAS/postgresql.memory.conf \
  && chown -R enterprisedb:enterprisedb /etc/$PPAS \
- && chown enterprisedb:enterprisedb /tmp/edbpass \
- && chown enterprisedb:enterprisedb /$EDBHOME/entrypoint.sh \
+ && chown enterprisedb:enterprisedb $EDBHOME/entrypoint.sh \
  && chown -R enterprisedb:enterprisedb /entrypoint-initdb.d
 
 WORKDIR $EDBHOME
@@ -28,15 +23,16 @@ ENV PGPORT 5432
 ENV PPAS ppas-$PPAS_MAJOR
 
 ENV PGDATA=/pgdata/$PPAS \
-  PGXLOG=/pgxlog/$PPAS \
-  PGLOG=/pglog/$PPAS \
-  PGENGINE=/usr/$PPAS/bin \
-  PATH=/usr/$PPAS/bin:$PATH
+    PGXLOG=/pgxlog/$PPAS \
+    PGLOG=/pglog/$PPAS \
+    PATH=/usr/$PPAS/bin:$PATH \
+    PGENGINE=/usr/$PPAS/bin
 
 # volume for Unix socket
 VOLUME /var/run/$PPAS
 
-# for internal dockers
+# volume for linked / volume-from dockers
+# should move this to a standalone, volume-only container.
 VOLUME $EDBHOME
 
 # volume for any of: data, xlog, log, that don't get explicitly mounted in volume only containers
