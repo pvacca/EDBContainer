@@ -5,8 +5,8 @@ pgstattuple
 pg_buffercache
 pg_stat_statements"
 
-for db in edb template1; do
+for db in edb postgres template1; do
   for extension in $EXTENSIONS; do
-    edb-psql -d $db -q -c "CREATE EXTENSION $extension;"
+    edb-psql -X -U enterprisedb -d $db -q -c "CREATE EXTENSION $extension;"
   done
 done
