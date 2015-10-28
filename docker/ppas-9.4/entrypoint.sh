@@ -4,20 +4,29 @@ set -e
 LISTEN_ADDRESSES=${LISTEN_ADDRESSES:-"*"}
 AUTH=${AUTH:-"md5"}
 
-## commands are: initdb, start - with trailing arguments appended to initdb
-##     or postmaster respectively; any other argument passed to exec
+##  commands are: initdb - trailing args (if any) passed to initdb
+##                Provide ENTERPRISEDB_PASSWORD environment var when using initdb.
+##    start - trailing args (if any) passed to postmaster
+##    replica - expects 1st following arg to be the Primary db server;
+##              additional trailing args (if any) passed to pg_basebackup
+##  any other command passed directly to exec
 case "$1" in
 "initdb" )
   shift
-  $PGENGINE/initdb --auth=$AUTH \
-    --pgdata=$PGDATA \
-    --xlogdir=$PGXLOG \
-    --pwfile=/tmp/edbpass \
-    "$@" \
-      >> $PGLOG/initdb.log 2>&1
 
-  echo "*:$PGPORT:*:enterprisedb:$(cat /tmp/edbpass)" >> ~/.pgpass
-  rm -f /tmp/edbpass
+  echo "$ENTERPRISEDB_PASSWORD" > ~/edbpass && chmod 0400 ~/edbpass
+
+  $PGENGINE/initdb --auth=$AUTH \
+    --pgdata="$PGDATA" \
+    --xlogdir="$PGXLOG" \
+    --pwfile="$EDBHOME/edbpass" \
+    "$@" \
+      >> "$PGLOG/initdb.log" 2>&1
+
+  PGPASS_ENTRY="*:$PGPORT:*:enterprisedb:$(cat ~/edbpass)"
+  echo $PGPASS_ENTRY > ~enterprisedb/.pgpass
+
+  rm -f ~/edbpass
 
   mv $PGDATA/postgresql.conf $PGDATA/postgresql.conf.default
   echo "listen_addresses = '$LISTEN_ADDRESSES'" > $PGDATA/postgresql.conf
@@ -36,28 +45,25 @@ case "$1" in
         ;;
       *.sql)
         echo "$0: running $f" >>$PGLOG/initdb.log
-        $PGENGINE/edb-psql -h localhost -f "$f" >> $PGLOG/initdb.log 2>&1
+                $PGENGINE/edb-psql -h localhost -f "$f" >> $PGLOG/initdb.log 2>&1
         ;;
       *)  echo "$0: ignored $f" >>$PGLOG/initdb.log ;;
     esac
   done
   # all scripts have run, some may require restart to apply.
-  $PGENGINE/pg_ctl stop -m fast
+    $PGENGINE/pg_ctl stop -m fast
   # restart ppas in the foreground
-  $PGENGINE/edb-postgres -D $PGDATA >> $PGLOG/pgstartup.log 2>&1 </dev/null
+    $PGENGINE/edb-postgres -D $PGDATA >> $PGLOG/pgstartup.log 2>&1 </dev/null
   ;;
 "replica")
   shift
-  # expect following argument is primary host.
-  # If started as a linked container, this will also be in an environment var
+  # expect first following argument is the primary host.
   PRIMARY="$1" && shift
   [ "$REPL_PASSWORD" ] && \
-    echo "*:$PGPORT:replication:repl:$REPL_PASSWORD" >> $EDBHOME/.pgpass
-
-  # $PGENGINE/edb-psql -h ppas -p 5432 -l >> $PGLOG/basebackup.log 2>&1
+    echo "*:$PGPORT:replication:repl:$REPL_PASSWORD" >> ~/.pgpass
 
   $PGENGINE/pg_basebackup -U repl \
-    -h "$PRIMARY" -p $PGPORT \
+    -h $PRIMARY -p $PGPORT \
     --xlog-method=stream \
     --pgdata=$PGDATA --xlogdir=$PGXLOG \
     --checkpoint=fast \
@@ -70,7 +76,7 @@ case "$1" in
 "start")
   shift
   # start and leave in foreground
-  $PGENGINE/edb-postgres -D $PGDATA "$@" >> $PGLOG/pgstartup.log 2>&1 </dev/null
+    $PGENGINE/edb-postgres -D $PGDATA "$@" >> $PGLOG/pgstartup.log 2>&1 </dev/null
   ;;
 *)
   exec "$@"

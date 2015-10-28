@@ -1,0 +1,12 @@
+Postgres Plus Advanced Server 9.4 Docker Image
+----------------------------------------------
+
+Image is invoked with one of three commands:
+  initdb - trailing args (if any) passed to initdb
+      Provide ENTERPRISEDB_PASSWORD environment var when using
+        initdb.
+  start - trailing args (if any) passed to postmaster
+  replica - expects 1st following arg to be the Primary db server;
+      additional trailing args (if any) passed to pg_basebackup
+Any other command (e.g. `/bin/bash`) passed directly to exec.
+Note: The container runs as the user enterprisedb, not as root.
