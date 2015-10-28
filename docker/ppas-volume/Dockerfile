@@ -1,7 +1,7 @@
 FROM edb-yum
 MAINTAINER phil.vacca@enterprisedb.com
 LABEL vendor="EnterpriseDB" \
-  version="0.0.1" \
+  version="9.4" \
   description="Postgres Plus Advanced Server volume only container." \
   type="volume"
 
