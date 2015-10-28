@@ -12,7 +12,7 @@ case "$1" in
 "dataxlog")
   shift
   mkdir -p $PGDATA && chown -R enterprisedb:enterprisedb $PGDATA && chmod 0700 $PGDATA
-  mkdir -p $PGXLOG && chown -R enterprisedb:enterprisedb $PGXLOG
+  mkdir -p $PGXLOG && chown -R enterprisedb:enterprisedb $PGXLOG && chmod 0700 $PGDATA
   ;;
 "data-only")
   shift
