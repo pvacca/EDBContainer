@@ -47,4 +47,4 @@ ENTRYPOINT ["./entrypoint.sh"]
 
 EXPOSE 8443 $PGPORT
 
-CMD [""]
+CMD ["pem"]

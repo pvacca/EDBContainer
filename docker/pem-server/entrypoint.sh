@@ -9,13 +9,12 @@ runuser enterprisedb --preserve-environment \
    --auth md5 \
    --pwfile ./edbpass"
 
-# rm -f ./edbpass
+rm -f ./edbpass
 
 runuser enterprisedb --preserve-environment \
   -c "$PGENGINE/pg_ctl -D $PGDATA -l $STARTUPLOG start -w"
 popd
 
-  #  --show_adv_opt 1 \
 ./$PEM_SERVER --mode unattended \
   --existing-user $EDB_ACCOUNT_USER \
   --existing-password $EDB_ACCOUNT_PASSWORD \
@@ -30,11 +29,16 @@ popd
 
 rm -rf $PEM_SERVER
 
-echo "hostssl  pem   +pem_agent   0.0.0.0/0   cert" >> $PGDATA/pg_hba.conf
+# add hostssl entry to top of pg_hba.conf so other agents can connect
+cp $PGDATA/pg_hba.conf $PGDATA/pg_hba.bak
+echo "hostssl  pem   +pem_agent   0.0.0.0/0   cert" > $PGDATA/pg_hba.conf
+echo "hostssl  pem   enterprisedb   0.0.0.0/0   cert" > $PGDATA/pg_hba.conf
+cat $PGDATA/pg_hba.bak >> $PGDATA/pg_hba.conf
 
 # rebuild certificates
 . ./generate_cert.sh
 
+# restart with new certificates
 pushd ~enterprisedb
 runuser enterprisedb --preserve-environment \
   -c "$PGENGINE/pg_ctl -D $PGDATA stop -m fast \
@@ -49,6 +53,11 @@ $PEM_AGENT/bin/pemagent \
   --pem-user enterprisedb \
   --display-name 'PEM Server'
 
-$PEM_AGENT/bin/pemagent -c $PEM_AGENT/etc/agent.cfg -l WARNING
-
-exec "$@"
+case "$1" in
+"pem")
+  $PEM_AGENT/bin/pemagent -c $PEM_AGENT/etc/agent.cfg -l WARNING -f
+  ;;
+*)
+  exec "$@"
+  ;;
+esac
