@@ -4,7 +4,11 @@ Postgres Plus Advanced Server 9.4 Docker Image
 Image is invoked with one of three commands:
   initdb - trailing args (if any) passed to initdb
       Provide ENTERPRISEDB_PASSWORD environment var when using
-        initdb.
+        initdb. The image is built with a script for initializing
+        to a Postgres Enterprise Manager (PEM) Server container.
+        If this image will be used without PEM, include the env
+        variable NO_PEM with any value (e.g. `docker run -d -e
+        "NO_PEM=1" ppas:9.4`)
   start - trailing args (if any) passed to postmaster
   replica - expects 1st following arg to be the Primary db server;
       additional trailing args (if any) passed to pg_basebackup

@@ -6,6 +6,8 @@ AUTH=${AUTH:-"md5"}
 
 ##  commands are: initdb - trailing args (if any) passed to initdb
 ##                Provide ENTERPRISEDB_PASSWORD environment var when using initdb.
+##                Define the env var NO_PEM with any value to prevent the pem-agent
+##                config script from running during initdb.
 ##    start - trailing args (if any) passed to postmaster
 ##    replica - expects 1st following arg to be the Primary db server;
 ##              additional trailing args (if any) passed to pg_basebackup
@@ -36,6 +38,7 @@ case "$1" in
 
   $PGENGINE/pg_ctl start -w >> $PGLOG/pgstartup.log 2>&1
 
+  [ $NO_PEM ] && rm -f /entrypoint-initdb.d/pem-agent.sh
   echo "Running contents of /entrypoint-initdb.d" >>$PGLOG/initdb.log
   for f in /entrypoint-initdb.d/*; do
     case "$f" in
