@@ -15,6 +15,7 @@ runuser enterprisedb --preserve-environment \
   -c "$PGENGINE/pg_ctl -D $PGDATA -l $STARTUPLOG start -w"
 popd
 
+echo "Initializing PEM Server"
 ./$PEM_SERVER --mode unattended \
   --existing-user $EDB_ACCOUNT_USER \
   --existing-password $EDB_ACCOUNT_PASSWORD \
@@ -32,12 +33,14 @@ rm -rf $PEM_SERVER
 # add hostssl entry to top of pg_hba.conf so other agents can connect
 cp $PGDATA/pg_hba.conf $PGDATA/pg_hba.bak
 echo "hostssl  pem   +pem_agent   0.0.0.0/0   cert" > $PGDATA/pg_hba.conf
-echo "hostssl  pem   enterprisedb   0.0.0.0/0   cert" > $PGDATA/pg_hba.conf
+echo "hostssl  pem   enterprisedb   0.0.0.0/0   trust" >> $PGDATA/pg_hba.conf
 cat $PGDATA/pg_hba.bak >> $PGDATA/pg_hba.conf
 
+echo "Re-generating certificates. . . "
 # rebuild certificates
 . ./generate_cert.sh
 
+echo "Restarting postgres"
 # restart with new certificates
 pushd ~enterprisedb
 runuser enterprisedb --preserve-environment \
@@ -45,6 +48,7 @@ runuser enterprisedb --preserve-environment \
   && $PGENGINE/pg_ctl -D $PGDATA -l $STARTUPLOG start -w"
 popd
 
+echo "Initializing Agent"
 $PEM_AGENT/bin/pemagent \
   --register-agent \
   --config-dir $PEM_AGENT/etc/ \
