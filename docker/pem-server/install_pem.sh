@@ -1,5 +1,7 @@
 #!/bin/bash
 
+chown enterprisedb:enterprisedb $PGDATA
+
 pushd ~enterprisedb
 echo $PGPASSWORD > ./edbpass
 chown enterprisedb:enterprisedb ./edbpass
