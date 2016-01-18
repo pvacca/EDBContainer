@@ -9,7 +9,7 @@ mkdir ~enterprisedb/.pem && chown enterprisedb:enterprisedb ~enterprisedb/.pem
 
 # grant permission for enterprisedb to start pem agent as root
 directive="#includedir /etc/sudoers.d"
-if ! grep --quiet "$directive" /etc/sudoers
+[ -f /etc/sudoers ] && if ! grep --quiet "$directive" /etc/sudoers; then
   echo "$directive" >>/etc/sudoers
 fi
 [ -d /etc/sudoers.d ] || mkdir /etc/sudoers.d
