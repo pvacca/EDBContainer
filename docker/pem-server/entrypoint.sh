@@ -37,7 +37,6 @@ echo "hostssl  pem   enterprisedb   0.0.0.0/0   trust" >> $PGDATA/pg_hba.conf
 cat $PGDATA/pg_hba.bak >> $PGDATA/pg_hba.conf
 
 echo "Re-generating certificates. . . "
-# rebuild certificates
 . ./generate_cert.sh
 
 echo "Restarting postgres"

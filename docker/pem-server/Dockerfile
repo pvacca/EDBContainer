@@ -8,17 +8,14 @@ LABEL vendor="EnterpriseDB" \
 ENV PEM_SERVER=pem_server-5.0.0-2-linux-x64.run \
     APACHE_PHP=apachephp-2.4.10-5.5.19-1-linux-x64.run \
     PHP_EDBPEM=php_edbpem-5.5.19-5.0.0-2-linux-x64.run \
-    PHP_ROOT=/opt/apachephp \
-    PEM_ROOT=/opt/pem-server \
+    PHP_ROOT=/usr/apachephp \
+    PEM_ROOT=/usr/pem-server \
     PEM_AGENT=/usr/pem-5.0 \
-    PGENGINE=/usr/$PPAS/bin \
-    PGDATA=/pgdata/$PPAS \
-    PGPORT=5444 \
     STARTUPLOG=/var/log/pgstartup.log
 
-RUN mkdir -p $PGDATA \
- && chown enterprisedb:enterprisedb $PGDATA \
- && touch $STARTUPLOG \
+#RUN mkdir -p $PGDATA \
+# && chown enterprisedb:enterprisedb $PGDATA \
+RUN touch $STARTUPLOG \
  && chown enterprisedb:enterprisedb $STARTUPLOG
 
 COPY $PEM_SERVER /root/
@@ -31,7 +28,7 @@ RUN mkdir edbpem && mkdir apache-php \
   --extract-apache-php apache-php \
   --extract-php_edbpem edbpem \
  && apache-php/$APACHE_PHP \
-  --mode text \
+  --mode unattended \
   --port 8080 \
   --prefix $PHP_ROOT \
  && edbpem/$PHP_EDBPEM \

@@ -1,5 +1,5 @@
 FROM centos:centos7
-MAINTAINER phil.vacca@enterprisedb.com
+MAINTAINER Philip Vacca <phil.vacca@enterprisedb.com>
 LABEL vendor="EnterpriseDB" \
   version="0.1" \
   description="EnterpriseDB YUM repository. Containers that inherit from edb-yum must provision these variable in /etc/yum/vars: yumusername, yumpassword, & postgresql_majorversion in order to install from repo." \
