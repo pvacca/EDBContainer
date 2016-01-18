@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 echo $PGPASSWORD > ~enterprisedb/edbpass
 chown enterprisedb:enterprisedb ~enterprisedb/edbpass
