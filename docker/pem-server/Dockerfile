@@ -5,6 +5,8 @@ LABEL vendor="EnterpriseDB" \
   description="" \
   type="pem-server"
 
+ENV PGPORT 5444
+
 ENV PEM_SERVER=pem_server-5.0.0-2-linux-x64.run \
     APACHE_PHP=apachephp-2.4.10-5.5.19-1-linux-x64.run \
     PHP_EDBPEM=php_edbpem-5.5.19-5.0.0-2-linux-x64.run \
