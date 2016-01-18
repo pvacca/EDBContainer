@@ -1,17 +1,20 @@
 #!/bin/bash
 
-echo $PGPASSWORD > ~enterprisedb/edbpass
-chown enterprisedb:enterprisedb ~enterprisedb/edbpass
+pushd ~enterprisedb
+echo $PGPASSWORD > ./edbpass
+chown enterprisedb:enterprisedb ./edbpass
 runuser enterprisedb --preserve-environment \
  -c "$PGENGINE/initdb --no-redwood-compat \
+   --data-checksums \
    --pgdata $PGDATA \
    --auth md5 \
-   --pwfile ~enterprisedb/edbpass"
+   --pwfile ./edbpass"
 
-rm -f ~enterprisedb/edbpass
+rm -f ./edbpass
 
 runuser enterprisedb --preserve-environment \
   -c "$PGENGINE/pg_ctl -D $PGDATA -l $STARTUPLOG start -w"
+popd
 
 echo "Initializing PEM Server"
 ./$PEM_SERVER --mode unattended \
