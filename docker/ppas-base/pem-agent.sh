@@ -8,8 +8,12 @@ chown -R enterprisedb:enterprisedb $PEM_AGENT
 mkdir ~enterprisedb/.pem && chown enterprisedb:enterprisedb ~enterprisedb/.pem
 
 # grant permission for enterprisedb to start pem agent as root
-echo "includedir /etc/sudoers.d" >>/etc/sudoers
-mkdir /etc/sudoers.d
+directive="#includedir /etc/sudoers.d"
+if ! grep --quiet "$directive" /etc/sudoers
+  echo "$directive" >>/etc/sudoers
+fi
+[ -d /etc/sudoers.d ] || mkdir /etc/sudoers.d
+
 cat > /etc/sudoers.d/01enterprisedb <<-EOF
 Cmnd_Alias PEM_AGENT = $PEM_AGENT/bin/pemagent, $PEM_AGENT/bin/pkgLauncher
 enterprisedb  ALL=(ALL)   NOPASSWD:   PEM_AGENT
