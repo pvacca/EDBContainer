@@ -7,7 +7,9 @@ LABEL vendor="EnterpriseDB" \
 
 ENV PGPORT 5444
 
-ENV PEM_SERVER=pem_server-5.0.0-2-linux-x64.run \
+ENV PATH=/usr/$PPAS/bin:$PATH \
+    PGENGINE=/usr/$PPAS/bin \
+    PEM_SERVER=pem_server-5.0.0-2-linux-x64.run \
     APACHE_PHP=apachephp-2.4.10-5.5.19-1-linux-x64.run \
     PHP_EDBPEM=php_edbpem-5.5.19-5.0.0-2-linux-x64.run \
     PHP_ROOT=/usr/apachephp \
@@ -35,10 +37,12 @@ RUN mkdir edbpem && mkdir apache-php \
   --prefix $PHP_ROOT \
  && edbpem/$PHP_EDBPEM \
   --prefix $PHP_ROOT \
-  --mode unattended
+  --mode unattended \
+ && rm -f -r edbpem apache-php
 
 COPY entrypoint.sh /root/
-COPY generate_cert.sh /root/
+COPY generate_cert.sh /root/generate_cert.sh
+COPY install_pem.sh /root/install_pem.sh
 
 VOLUME $PGDATA
 

@@ -15,9 +15,9 @@ find $PGDATA \
 
 function edb_owns {
 	chmod 0600 "$1"
-	chown enterprisedb "$1"
+	chown enterprisedb:enterprisedb "$1"
 }
-exec_SQL="edb-psql -X -U enterprisedb pem -q -t -A"
+exec_SQL="edb-psql -X -U enterprisedb -d pem -q -t -A"
 
 RSA_generate_key="SELECT public.openssl_rsa_generate_key(1024);"
 
@@ -35,7 +35,7 @@ edb_owns "$PGDATA/ca_certificate.crt"
 
 # root
 cp $PGDATA/ca_certificate.crt $PGDATA/root.crt
-chown enterprisedb $PGDATA/root.crt
+edb_owns $PGDATA/root.crt
 
 RSA_generate_CRL="SELECT openssl_rsa_generate_crl(\
 '$PGDATA/ca_certificate.crt', '$PGDATA/ca_key.key');"
